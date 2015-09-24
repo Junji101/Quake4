@@ -488,7 +488,7 @@ void GiveStuffToPlayer( idPlayer* player, const char* name, const char* value )
 	}
 
 	if ( idStr::Icmp( name, "regen" ) == 0 ) {
-		player->GivePowerUp( POWERUP_REGENERATION, SEC2MS( 30.0f ) );
+		player->GivePowerUp( POWERUP_EXTRALIFE, SEC2MS( 30.0f ) );
 		return;
 	}
 

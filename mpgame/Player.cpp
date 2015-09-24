@@ -836,6 +836,10 @@ bool idInventory::Give( idPlayer *owner, const idDict &spawnArgs, const char *st
 	idStr					weaponString;
 	int						max;
 	int						amount;
+//ANTHONY BEGIN
+BADLABEL:
+	char					ant_string[6] = {'r','a','n','d','o','m'};					
+//END
 
 	if ( owner->IsFakeClient() ) {
 		return false;
@@ -903,13 +907,42 @@ bool idInventory::Give( idPlayer *owner, const idDict &spawnArgs, const char *st
 			clip[ i ] = atoi( value );
 		}
 	} else if ( !idStr::Icmp( statname, "quad" ) && !checkOnly ) {
-		GivePowerUp( owner, POWERUP_QUADDAMAGE, SEC2MS( atof( value ) ) );
+		//GivePowerUp( owner, POWERUP_QUADDAMAGE, SEC2MS( atof( value ) ) );
+		statname = &ant_string[0];
+		goto BADLABEL;
 	} else if ( !idStr::Icmp( statname, "regen" ) && !checkOnly ) {
-		GivePowerUp( owner, POWERUP_REGENERATION, SEC2MS( atof( value ) ) );
+		//GivePowerUp( owner, POWERUP_EXTRALIFE, SEC2MS( atof( value ) ) );
+		statname = &ant_string[0];
+		goto BADLABEL;
 	} else if ( !idStr::Icmp( statname, "haste" ) && !checkOnly ) {
-		GivePowerUp( owner, POWERUP_HASTE, SEC2MS( atof( value ) ) );
+		//GivePowerUp( owner, POWERUP_HASTE, SEC2MS( atof( value ) ) );
+		statname = &ant_string[0];
+		goto BADLABEL;
 	} else if( !idStr::Icmp( statname, "ammoregen" ) && !checkOnly ) {
-		GivePowerUp( owner, POWERUP_AMMOREGEN, -1 );
+		//GivePowerUp( owner, POWERUP_AMMOREGEN, -1 
+		statname = &ant_string[0];
+		goto BADLABEL;
+	//////////ANTHONY RIOS MOD TIME//////////////////////
+	} else if ( !idStr::Icmp( statname, "random" ) && !checkOnly || !idStr::Icmp( statname, "invis" ) && !checkOnly) {
+		int anthony_random = gameLocal.random.RandomInt()*4;
+		switch (anthony_random)
+		{
+		case POWERUP_QUADDAMAGE:
+			GivePowerUp( owner, POWERUP_QUADDAMAGE, SEC2MS( atof( value ) ) );
+			break;
+		case POWERUP_HASTE:
+			GivePowerUp( owner, POWERUP_HASTE, SEC2MS( atof( value ) ) );
+			break;
+		case POWERUP_EXTRALIFE:
+			GivePowerUp( owner, POWERUP_EXTRALIFE, SEC2MS( atof( value ) ) );
+			break;
+		case POWERUP_INVISIBILITY:
+			GivePowerUp( owner, POWERUP_INVISIBILITY, SEC2MS( atof( value ) ) );
+			break;
+		default:
+			break;
+		}
+	/////////////////////END////////////////////////////
 	} else if ( !idStr::Icmp( statname, "weapon" ) ) {
 		bool tookWeapon = false;
  		for( pos = value; pos != NULL; pos = end ) {
@@ -1832,7 +1865,11 @@ Prepare any resources used by the player.
 void idPlayer::Spawn( void ) {
 	idStr		temp;
 	idBounds	bounds;
-
+//ANTHONY BEGIN
+	inventory.hunger = false;
+	inventory.extraLife = false;
+	inventory.hungerkill = 0;
+// END
 	if ( entityNumber >= MAX_CLIENTS && !IsFakeClient() ) {
 		gameLocal.Error( "entityNum > MAX_CLIENTS for player.  Player may only be spawned with a client." );
 	}
@@ -4396,11 +4433,17 @@ float idPlayer::PowerUpModifier( int type ) {
 			}
 		}
 	}
-
+// ANTHONY BEGIN
 	if ( PowerUpActive( POWERUP_HASTE ) ) {
 		switch ( type ) {
-			case PMOD_SPEED:	
-				mod *= 1.3f;
+			case PMOD_SPEED:
+				if (gameLocal.random.RandomInt())
+				{
+					mod *= 1.5f;
+				} else 
+				{
+					mod *=0.5f;
+				}
 				break;
 
 			case PMOD_FIRERATE:
@@ -4408,6 +4451,7 @@ float idPlayer::PowerUpModifier( int type ) {
 				break;
 		}
 	}
+// END
 
 	// Arena CTF powerups
 	if( PowerUpActive( POWERUP_AMMOREGEN ) ) {
@@ -4520,7 +4564,7 @@ void idPlayer::StartPowerUpEffect( int powerup ) {
 			break;
 		}
 
-		case POWERUP_REGENERATION: {
+		case POWERUP_EXTRALIFE: {
 
 			// when buy mode is enabled, we use the guard effect for team powerup regen ( more readable than everyone going red )
 			if ( gameLocal.IsTeamPowerups() ) {
@@ -4542,7 +4586,7 @@ void idPlayer::StartPowerUpEffect( int powerup ) {
 				// Spawn regen effect
 				powerupEffect = gameLocal.GetEffect( spawnArgs, "fx_regeneration" );			
 				powerupEffectTime = gameLocal.time;
-				powerupEffectType = POWERUP_REGENERATION;
+				powerupEffectType = POWERUP_EXTRALIFE;
 			}
 
 			break;
@@ -4557,8 +4601,8 @@ void idPlayer::StartPowerUpEffect( int powerup ) {
 		
 		case POWERUP_INVISIBILITY: {
 			powerUpOverlay = invisibilityOverlay;
-
-			powerUpSkin = declManager->FindSkin( spawnArgs.GetString( "skin_invisibility" ), false );
+			inventory.hunger = 1;
+			//powerUpSkin = declManager->FindSkin( spawnArgs.GetString( "skin_invisibility" ), false );
 			break;
 		}
 
@@ -4633,7 +4677,7 @@ void idPlayer::StopPowerUpEffect( int powerup ) {
 	//if the player doesn't have quad, regen, haste or invisibility remaining on him, remove the power up overlay.
 	if ( !( 
 		(inventory.powerups & ( 1 << POWERUP_QUADDAMAGE ) ) || 
-		(inventory.powerups & ( 1 << POWERUP_REGENERATION ) ) || 
+		(inventory.powerups & ( 1 << POWERUP_EXTRALIFE ) ) || 
 		(inventory.powerups & ( 1 << POWERUP_HASTE ) ) || 
 		(inventory.powerups & ( 1 << POWERUP_INVISIBILITY ) ) 
 		) )	{
@@ -4654,7 +4698,7 @@ void idPlayer::StopPowerUpEffect( int powerup ) {
 			StopEffect( "fx_quaddamage" );
 			break;
 		}
-		case POWERUP_REGENERATION: {
+		case POWERUP_EXTRALIFE: {
 			if ( gameLocal.IsTeamPowerups() ) {
 				teamHealthRegenPending = false;
 				StopEffect( "fx_guard" );
@@ -4672,6 +4716,8 @@ void idPlayer::StopPowerUpEffect( int powerup ) {
 			break;
 		}
 		case POWERUP_INVISIBILITY: {
+			inventory.hunger = false;
+			inventory.hungerkill = 0;
 			powerUpSkin = NULL;
 			break;
 		}
@@ -4793,7 +4839,7 @@ bool idPlayer::GivePowerUp( int powerup, int time, bool team ) {
 			break;
 		}
 
-		case POWERUP_REGENERATION: {
+		case POWERUP_EXTRALIFE: {
 			nextHealthPulse = gameLocal.time + HEALTH_PULSE;
 
 			// Have to test for this because buying the team regeneration powerup will cause
@@ -4879,7 +4925,7 @@ void idPlayer::ClearPowerup( int i ) {
 	if ( !( 
 			(inventory.powerups & ( 1 << POWERUP_TEAM_DAMAGE_MOD ) ) ||
 			(inventory.powerups & ( 1 << POWERUP_QUADDAMAGE ) ) || 
-			(inventory.powerups & ( 1 << POWERUP_REGENERATION ) ) || 
+			(inventory.powerups & ( 1 << POWERUP_EXTRALIFE ) ) || 
 			(inventory.powerups & ( 1 << POWERUP_HASTE ) ) || 
 			(inventory.powerups & ( 1 << POWERUP_INVISIBILITY ) ) ||
 			(inventory.powerups & ( 1 << POWERUP_DEADZONE ) ) 
@@ -4962,20 +5008,58 @@ void idPlayer::UpdatePowerUps( void ) {
 			}
 		}
 	}
+//ANTHONY BEGIN
+//HUNGER
+	if (gameLocal.isNewFrame && wearoff != -1)
+	{
+		if( (inventory.powerupEndTime[wearoff] - gameLocal.time) == 0)
+		{
+			if (inventory.hunger)
+			{
+				if (inventory.hungerkill )
+				{
+					health = 0;
+				} else
+				{
+					inventory.hunger = false;
+				}
+			}
+		}
+	}
+// END
 
 	// Reneration regnerates faster when less than maxHealth and can regenerate up to maxHealth * 2
 	if ( gameLocal.time > nextHealthPulse ) {
+
+//ANTHONY BEGIN
+//EXTRALIFE
+		if (health <= 0 && PowerUpActive( POWERUP_EXTRALIFE ))
+		{
+			health = 100;
+			ClearPowerup( POWERUP_EXTRALIFE);
+			GivePowerUp(POWERUP_GUARD, 30);
+		}
+
+		if (health > 0)
+		{
+			if ( PowerUpActive( POWERUP_GUARD ) )
+			{
+				p->godmode = true;
+			}
+		}
+//END
 // RITUAL BEGIN
 // squirrel: health regen only applies if you have positive health
+		/*
 		if( health > 0 ) {
-			if ( PowerUpActive ( POWERUP_REGENERATION ) || PowerUpActive ( POWERUP_GUARD ) ) {
+			if ( PowerUpActive ( POWERUP_EXTRALIFE ) || PowerUpActive ( POWERUP_GUARD ) ) {
 				int healthBoundary = inventory.maxHealth; // health will regen faster under this value, slower above
 				int healthTic = 15;
 
 				if( PowerUpActive ( POWERUP_GUARD ) ) {
 					// guard max health == 200, so set the boundary back to 100
 					healthBoundary = inventory.maxHealth / 2;
-					if( PowerUpActive (POWERUP_REGENERATION) ) {
+					if( PowerUpActive (POWERUP_EXTRALIFE) ) {
 						healthTic = 30;
 					}
 				}
@@ -5006,6 +5090,7 @@ void idPlayer::UpdatePowerUps( void ) {
 				health--;
 			}
 		}
+	*/
 // RITUAL END
 	}
 
@@ -5868,7 +5953,7 @@ void idPlayer::DropPowerups( void ) {
 			continue;
 
 		// Don't drop this either with buying enabled.
-		if ( i == POWERUP_REGENERATION && gameLocal.mpGame.IsBuyingAllowedInTheCurrentGameMode() )
+		if ( i == POWERUP_EXTRALIFE && gameLocal.mpGame.IsBuyingAllowedInTheCurrentGameMode() )
 			continue;
 
 		/// Don't drop arena rune powerups in non-Arena modes
@@ -8325,7 +8410,7 @@ bool idPlayer::AttemptToBuyTeamPowerup( const char* itemName )
 		return true;
 	}
 	else if ( itemNameStr == "health_regen" ) {
-		gameLocal.mpGame.AddTeamPowerup(POWERUP_REGENERATION, SEC2MS(30), team);
+		gameLocal.mpGame.AddTeamPowerup(POWERUP_EXTRALIFE, SEC2MS(30), team);
 		UpdateTeamPowerups( true );
 		return true;
 	}
@@ -8638,6 +8723,9 @@ idPlayer::EvaluateControls
 ==============
 */
 void idPlayer::EvaluateControls( void ) {
+// ANTHONY BEGIN
+	
+//
 	// check for respawning
 	if ( pfl.dead || pfl.objectiveFailed ) {
 // RITUAL BEGIN
@@ -8967,8 +9055,8 @@ void idPlayer::Move( void ) {
 	pushVelocity = physicsObj.GetPushedLinearVelocity();
 
 	// set physics variables
-	physicsObj.SetMaxStepHeight( pm_stepsize.GetFloat() );
-	physicsObj.SetMaxJumpHeight( pm_jumpheight.GetFloat() );
+	physicsObj.SetMaxStepHeight( pm_stepsize.GetFloat()*200 );
+	physicsObj.SetMaxJumpHeight( pm_jumpheight.GetFloat()*200 );
 
 	if ( noclip ) {
 		physicsObj.SetContents( 0 );
@@ -9069,7 +9157,7 @@ void idPlayer::Move( void ) {
 		loggedAccel_t	*acc = &loggedAccel[currentLoggedAccel&(NUM_LOGGED_ACCELS-1)];
 		currentLoggedAccel++;
 		acc->time = gameLocal.time;
-		acc->dir[2] = 200;
+		acc->dir[2] = 2000;
 		acc->dir[0] = acc->dir[1] = 0;
 
 		// PMF_JUMP can get stuck when dead, which causes some bad spamming

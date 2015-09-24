@@ -122,7 +122,7 @@ enum {
 	// standard powerups
 	POWERUP_QUADDAMAGE = 0, 
 	POWERUP_HASTE,
-	POWERUP_REGENERATION,
+	POWERUP_EXTRALIFE,
 	POWERUP_INVISIBILITY,
 		
 	// ctf powerups
@@ -193,6 +193,13 @@ typedef enum {
 const int	ASYNC_PLAYER_TOURNEY_STATUS_BITS = idMath::BitsForInteger( PTS_NUM_STATES );
 
 class idInventory {
+//ANTHONY BEGIN
+public:
+	bool					extraLife;
+	bool					hunger;
+
+	int						hungerkill;
+// END
 public:
 	int						maxHealth;
 	int						weapons;

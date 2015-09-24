@@ -906,6 +906,11 @@ bool idInventory::Give( idPlayer *owner, const idDict &spawnArgs, const char *st
 		GivePowerUp( owner, POWERUP_HASTE, SEC2MS( atof( value ) ) );
 	} else if( !idStr::Icmp( statname, "ammoregen" ) && !checkOnly ) {
 		GivePowerUp( owner, POWERUP_AMMOREGEN, -1 );
+	/////// ANTHONY RIOS MOD TIME ///////////////////
+	} else if ( !idStr::Icmp( statname, "random" ) ) {
+		
+		GivePowerUp( owner, POWERUP_QUADDAMAGE, SEC2MS( atof( value ) ) );
+	//////////////////END////////////////////////////
 	} else if ( !idStr::Icmp( statname, "weapon" ) ) {
 		bool tookWeapon = false;
  		for( pos = value; pos != NULL; pos = end ) {

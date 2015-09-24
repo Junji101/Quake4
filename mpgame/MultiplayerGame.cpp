@@ -5936,7 +5936,7 @@ void idMultiplayerGame::CheckSpecialLights( void ) {
 		else if( p->PowerUpActive( POWERUP_QUADDAMAGE ) || p->PowerUpActive( POWERUP_TEAM_DAMAGE_MOD )) {
 			quadDamageCarrier = p;
 		}
-		else if( p->PowerUpActive( POWERUP_REGENERATION ) ) {
+		else if( p->PowerUpActive( POWERUP_EXTRALIFE ) ) {
 			regenerationCarrier = p;
 		}
 		else if( p->PowerUpActive( POWERUP_HASTE ) ) {
