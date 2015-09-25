@@ -240,6 +240,9 @@ public:
 
 	void					Clear( void );
 	void					GivePowerUp( idPlayer* player, int powerup, int msec );
+// ANTHONY BEGIN
+	void					GiveRandomPowerUp( idPlayer* owner, int msec);
+// END
 	void					ClearPowerUps( void );
 	void					GetPersistantData( idDict &dict );
 	void					RestoreInventory( idPlayer *owner, const idDict &dict );

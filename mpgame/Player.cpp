@@ -243,6 +243,21 @@ void idInventory::GivePowerUp( idPlayer *player, int powerup, int msec ) {
 	powerupEndTime[ powerup ] = msec == -1 ? -1 : (gameLocal.time + msec);
 }
 
+/**
+ * @author Anthony
+ * @brief Gives Random power up to player
+ * @param player the player getting the powerup
+ * @param msec amount of time powerup will apply
+ * @return none
+ */
+
+void idInventory::GiveRandomPowerUp( idPlayer *player, int msec ) {
+	int anthony_random = gameLocal.random.RandomInt(4);
+	powerups |= 1 << anthony_random;
+	powerupEndTime[ anthony_random ] = msec == -1 ? -1 : (gameLocal.time + msec);
+}
+
+
 /*
 ==============
 idInventory::ClearPowerUps
@@ -836,10 +851,6 @@ bool idInventory::Give( idPlayer *owner, const idDict &spawnArgs, const char *st
 	idStr					weaponString;
 	int						max;
 	int						amount;
-//ANTHONY BEGIN
-BADLABEL:
-	char					ant_string[6] = {'r','a','n','d','o','m'};					
-//END
 
 	if ( owner->IsFakeClient() ) {
 		return false;
@@ -906,43 +917,23 @@ BADLABEL:
 			// set, don't add. not going over the clip size limit.
 			clip[ i ] = atoi( value );
 		}
+// ANTHONY BEGIN
 	} else if ( !idStr::Icmp( statname, "quad" ) && !checkOnly ) {
 		//GivePowerUp( owner, POWERUP_QUADDAMAGE, SEC2MS( atof( value ) ) );
-		statname = &ant_string[0];
-		goto BADLABEL;
+		GiveRandomPowerUp( owner, SEC2MS( atof( value ) ) );
 	} else if ( !idStr::Icmp( statname, "regen" ) && !checkOnly ) {
 		//GivePowerUp( owner, POWERUP_EXTRALIFE, SEC2MS( atof( value ) ) );
-		statname = &ant_string[0];
-		goto BADLABEL;
+		GiveRandomPowerUp( owner, SEC2MS( atof( value ) ) );
 	} else if ( !idStr::Icmp( statname, "haste" ) && !checkOnly ) {
 		//GivePowerUp( owner, POWERUP_HASTE, SEC2MS( atof( value ) ) );
-		statname = &ant_string[0];
-		goto BADLABEL;
+		GiveRandomPowerUp( owner, SEC2MS( atof( value ) ) );
 	} else if( !idStr::Icmp( statname, "ammoregen" ) && !checkOnly ) {
-		//GivePowerUp( owner, POWERUP_AMMOREGEN, -1 
-		statname = &ant_string[0];
-		goto BADLABEL;
-	//////////ANTHONY RIOS MOD TIME//////////////////////
-	} else if ( !idStr::Icmp( statname, "random" ) && !checkOnly || !idStr::Icmp( statname, "invis" ) && !checkOnly) {
-		int anthony_random = gameLocal.random.RandomInt()*4;
-		switch (anthony_random)
-		{
-		case POWERUP_QUADDAMAGE:
-			GivePowerUp( owner, POWERUP_QUADDAMAGE, SEC2MS( atof( value ) ) );
-			break;
-		case POWERUP_HASTE:
-			GivePowerUp( owner, POWERUP_HASTE, SEC2MS( atof( value ) ) );
-			break;
-		case POWERUP_EXTRALIFE:
-			GivePowerUp( owner, POWERUP_EXTRALIFE, SEC2MS( atof( value ) ) );
-			break;
-		case POWERUP_INVISIBILITY:
-			GivePowerUp( owner, POWERUP_INVISIBILITY, SEC2MS( atof( value ) ) );
-			break;
-		default:
-			break;
-		}
-	/////////////////////END////////////////////////////
+		//GivePowerUp( owner, POWERUP_AMMOREGEN, -1
+		GiveRandomPowerUp( owner, SEC2MS( atof( value ) ) );
+	} else if (!idStr::Icmp( statname, "invis" ) && !checkOnly) {
+		//GivePowerUp( owner, POWERUP_INVISIBILITY, SEC2MS( atof( value ) ) );
+		GiveRandomPowerUp( owner, SEC2MS( atof( value ) ) );
+// END
 	} else if ( !idStr::Icmp( statname, "weapon" ) ) {
 		bool tookWeapon = false;
  		for( pos = value; pos != NULL; pos = end ) {
@@ -4437,7 +4428,7 @@ float idPlayer::PowerUpModifier( int type ) {
 	if ( PowerUpActive( POWERUP_HASTE ) ) {
 		switch ( type ) {
 			case PMOD_SPEED:
-				if (gameLocal.random.RandomInt())
+				if (gameLocal.random.RandomInt(2) == 0)
 				{
 					mod *= 1.5f;
 				} else 
@@ -4716,8 +4707,10 @@ void idPlayer::StopPowerUpEffect( int powerup ) {
 			break;
 		}
 		case POWERUP_INVISIBILITY: {
+// ANTHONY BEGIN
 			inventory.hunger = false;
 			inventory.hungerkill = 0;
+// END
 			powerUpSkin = NULL;
 			break;
 		}

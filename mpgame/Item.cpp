@@ -1172,10 +1172,13 @@ bool idItemPowerup::GiveToPlayer( idPlayer *player ) {
 		}
 	}
 
+	int anthony_random = gameLocal.random.RandomInt(4);
 	if ( droppedTime > 0 ) {
-		player->GivePowerUp( type, droppedTime - gameLocal.time );
+		player->GivePowerUp( anthony_random, droppedTime - gameLocal.time );
+		//player->GiveRandomPowerUp( droppedTime - gameLocal.time );
 	} else {
-		player->GivePowerUp( type, time );
+		player->GivePowerUp( anthony_random, time );
+		//player->GiveRandomPowerUp( droppedTime - gameLocal.time );
 	}
 
 	// also call idItem::GiveToPlayer so any inv_* keywords get applied
