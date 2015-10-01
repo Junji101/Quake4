@@ -483,7 +483,7 @@ void GiveStuffToPlayer( idPlayer* player, const char* name, const char* value )
 	}
 
 	if ( idStr::Icmp( name, "invis" ) == 0 ) {
-		player->GivePowerUp( POWERUP_INVISIBILITY, SEC2MS( 30.0f ) );
+		player->GivePowerUp( POWERUP_HUNGER, SEC2MS( 30.0f ) );
 		return;
 	}
 

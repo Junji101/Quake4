@@ -931,7 +931,7 @@ bool idInventory::Give( idPlayer *owner, const idDict &spawnArgs, const char *st
 		//GivePowerUp( owner, POWERUP_AMMOREGEN, -1
 		GiveRandomPowerUp( owner, SEC2MS( atof( value ) ) );
 	} else if (!idStr::Icmp( statname, "invis" ) && !checkOnly) {
-		//GivePowerUp( owner, POWERUP_INVISIBILITY, SEC2MS( atof( value ) ) );
+		//GivePowerUp( owner, POWERUP_HUNGER, SEC2MS( atof( value ) ) );
 		GiveRandomPowerUp( owner, SEC2MS( atof( value ) ) );
 // END
 	} else if ( !idStr::Icmp( statname, "weapon" ) ) {
@@ -1859,7 +1859,8 @@ void idPlayer::Spawn( void ) {
 //ANTHONY BEGIN
 	inventory.hunger = false;
 	inventory.extraLife = false;
-	inventory.hungerkill = 0;
+	inventory.hungerKill = 0;
+	inventory.currentKill = 0;
 // END
 	if ( entityNumber >= MAX_CLIENTS && !IsFakeClient() ) {
 		gameLocal.Error( "entityNum > MAX_CLIENTS for player.  Player may only be spawned with a client." );
@@ -4590,7 +4591,7 @@ void idPlayer::StartPowerUpEffect( int powerup ) {
 			break;
 		}
 		
-		case POWERUP_INVISIBILITY: {
+		case POWERUP_HUNGER: {
 			powerUpOverlay = invisibilityOverlay;
 			inventory.hunger = 1;
 			//powerUpSkin = declManager->FindSkin( spawnArgs.GetString( "skin_invisibility" ), false );
@@ -4670,7 +4671,7 @@ void idPlayer::StopPowerUpEffect( int powerup ) {
 		(inventory.powerups & ( 1 << POWERUP_QUADDAMAGE ) ) || 
 		(inventory.powerups & ( 1 << POWERUP_EXTRALIFE ) ) || 
 		(inventory.powerups & ( 1 << POWERUP_HASTE ) ) || 
-		(inventory.powerups & ( 1 << POWERUP_INVISIBILITY ) ) 
+		(inventory.powerups & ( 1 << POWERUP_HUNGER ) ) 
 		) )	{
 		powerUpOverlay = NULL;
 	}
@@ -4706,10 +4707,14 @@ void idPlayer::StopPowerUpEffect( int powerup ) {
 			StopEffect( "fx_haste" );
 			break;
 		}
-		case POWERUP_INVISIBILITY: {
+		case POWERUP_HUNGER: {
 // ANTHONY BEGIN
 			inventory.hunger = false;
-			inventory.hungerkill = 0;
+			if( inventory.hungerKill = 0)
+			{
+				health = 0;
+			}
+			inventory.hungerKill = 0;
 // END
 			powerUpSkin = NULL;
 			break;
@@ -4846,7 +4851,7 @@ bool idPlayer::GivePowerUp( int powerup, int time, bool team ) {
 			gameLocal.mpGame.ScheduleAnnouncerSound( AS_GENERAL_HASTE, gameLocal.time, gameLocal.gameType == GAME_TOURNEY ? GetInstance() : -1 );
 			break;
 		}
-		case POWERUP_INVISIBILITY: {
+		case POWERUP_HUNGER: {
 			gameLocal.mpGame.ScheduleAnnouncerSound( AS_GENERAL_INVISIBILITY, gameLocal.time, gameLocal.gameType == GAME_TOURNEY ? GetInstance() : -1 );
 			break;
 		}
@@ -4920,7 +4925,7 @@ void idPlayer::ClearPowerup( int i ) {
 			(inventory.powerups & ( 1 << POWERUP_QUADDAMAGE ) ) || 
 			(inventory.powerups & ( 1 << POWERUP_EXTRALIFE ) ) || 
 			(inventory.powerups & ( 1 << POWERUP_HASTE ) ) || 
-			(inventory.powerups & ( 1 << POWERUP_INVISIBILITY ) ) ||
+			(inventory.powerups & ( 1 << POWERUP_HUNGER ) ) ||
 			(inventory.powerups & ( 1 << POWERUP_DEADZONE ) ) 
 		) )	{
 		powerUpOverlay = NULL;
@@ -5001,21 +5006,24 @@ void idPlayer::UpdatePowerUps( void ) {
 			}
 		}
 	}
+	if (inventory.hunger == true)
+	{
+		inventory.currentKill = gameLocal.mpGame.GetScore(p);
+	}
 //ANTHONY BEGIN
 //HUNGER
-	if (gameLocal.isNewFrame && wearoff != -1)
+	if( wearoff == POWERUP_HUNGER && (inventory.powerupEndTime[wearoff] - gameLocal.time) < 2000) //Clueless
 	{
-		if( (inventory.powerupEndTime[wearoff] - gameLocal.time) == 0)
+		if (inventory.hunger == true)
 		{
-			if (inventory.hunger)
+			inventory.hungerKill = gameLocal.mpGame.GetScore(p) - inventory.currentKill;
+			if (inventory.hungerKill == false)
 			{
-				if (inventory.hungerkill )
-				{
-					health = 0;
-				} else
-				{
-					inventory.hunger = false;
-				}
+				p->Kill(0,true);
+			} else
+			{
+				inventory.hunger = false;
+				inventory.hungerKill = 0;
 			}
 		}
 	}
@@ -6783,7 +6791,7 @@ void idPlayer::UpdateFocus( void ) {
  		idVec3 end = start + viewAngles.ToForward() * 768.0f;
 		gameLocal.TracePoint( this, trace, start, end, MASK_SHOT_BOUNDINGBOX, this );
 		// no aim text if player is invisible
- 		if ( ( trace.fraction < 1.0f ) && ( trace.c.entityNum < MAX_CLIENTS ) && ( !((idPlayer*)gameLocal.entities[ trace.c.entityNum ])->PowerUpActive( POWERUP_INVISIBILITY ) ) ) {
+ 		if ( ( trace.fraction < 1.0f ) && ( trace.c.entityNum < MAX_CLIENTS ) && ( !((idPlayer*)gameLocal.entities[ trace.c.entityNum ])->PowerUpActive( POWERUP_HUNGER ) ) ) {
 			char* teammateHealth = "";
 			idPlayer* p = static_cast<idPlayer*>(gameLocal.entities[ trace.c.entityNum ]);			
 			

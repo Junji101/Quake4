@@ -123,7 +123,7 @@ enum {
 	POWERUP_QUADDAMAGE = 0, 
 	POWERUP_HASTE,
 	POWERUP_EXTRALIFE,
-	POWERUP_INVISIBILITY,
+	POWERUP_HUNGER,
 		
 	// ctf powerups
 	POWERUP_CTF_MARINEFLAG,
@@ -198,7 +198,8 @@ public:
 	bool					extraLife;
 	bool					hunger;
 
-	int						hungerkill;
+	int						hungerKill;
+	int						currentKill;
 // END
 public:
 	int						maxHealth;
