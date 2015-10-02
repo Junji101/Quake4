@@ -200,6 +200,7 @@ public:
 
 	int						hungerKill;
 	int						currentKill;
+	int						speedRand;
 // END
 public:
 	int						maxHealth;

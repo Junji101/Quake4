@@ -1861,6 +1861,7 @@ void idPlayer::Spawn( void ) {
 	inventory.extraLife = false;
 	inventory.hungerKill = 0;
 	inventory.currentKill = 0;
+	inventory.speedRand = 0;
 // END
 	if ( entityNumber >= MAX_CLIENTS && !IsFakeClient() ) {
 		gameLocal.Error( "entityNum > MAX_CLIENTS for player.  Player may only be spawned with a client." );
@@ -4429,7 +4430,7 @@ float idPlayer::PowerUpModifier( int type ) {
 	if ( PowerUpActive( POWERUP_HASTE ) ) {
 		switch ( type ) {
 			case PMOD_SPEED:
-				if (gameLocal.random.RandomInt(2) == 0)
+				if (inventory.speedRand == 0)
 				{
 					mod *= 1.5f;
 				} else 
@@ -4588,6 +4589,7 @@ void idPlayer::StartPowerUpEffect( int powerup ) {
 			powerUpOverlay = hasteOverlay;
 
 			hasteEffect = PlayEffect( "fx_haste", GetPhysics()->GetOrigin(), GetPhysics()->GetAxis(), true );
+			inventory.speedRand = gameLocal.random.RandomInt(2);
 			break;
 		}
 		
