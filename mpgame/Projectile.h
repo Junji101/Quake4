@@ -18,6 +18,8 @@ extern const idEventDef EV_Explode;
 
 class idProjectile : public idEntity {
 public :
+	int						spawnTimer;
+public :
 	CLASS_PROTOTYPE( idProjectile );
 
 							idProjectile();

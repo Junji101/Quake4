@@ -113,6 +113,8 @@ void idProjectile::Spawn( void ) {
 	}
 
 	predictedProjectiles = g_predictedProjectiles.GetBool();
+	spawnTimer = 0;
+	common->Printf("Spawn Timer : %d \n", spawnTimer);
 }
 
 /*
@@ -545,8 +547,27 @@ void idProjectile::Think( void ) {
 			if ( speed.IsDone ( gameLocal.time ) ) {
 				updateVelocity = false;
 			}
+			
 		}
-		
+		if (spawnTimer < (gameLocal.time + 500) && spawnTimer != 0 ) 
+		{
+				common->Printf("THIS RUNS \n");
+				idVec3 org;
+				idDict dict;
+				idPlayer *player = gameLocal.GetLocalPlayer();
+				float yaw = player->viewAngles.yaw;
+
+				const char *value = this->GetEntityDefClassName();
+				dict.Set( "classname", value );
+				dict.Set( "angle", va( "%f", yaw + 180 ) );
+
+				org = this->GetPhysics()->GetOrigin() + idAngles( 0, yaw, 0 ).ToForward() * 80 + idVec3( 0, 0, 1 );
+				dict.Set( "origin", org.ToString() );	
+
+				idEntity *newEnt = NULL;
+				gameLocal.SpawnEntityDef( dict, &newEnt );
+		}
+
 		RunPhysics();
 		
 		// If we werent at rest and are now then start the atrest fuse
@@ -558,6 +579,7 @@ void idProjectile::Think( void ) {
 					PostEventSec( &EV_Explode, fuse );
 				} else {
 					CancelEvents( &EV_Fizzle );
+					
 					PostEventSec( &EV_Fizzle, fuse );
 				}
 			}
@@ -599,6 +621,11 @@ void idProjectile::Think( void ) {
 		} else {
 			lightDefHandle = gameRenderWorld->AddLightDef( &renderLight );
 		}
+	}
+	if ( spawnTimer == 0 || spawnTimer < gameLocal.time)
+	{
+		spawnTimer = gameLocal.time + 1000;
+		common->Printf("spawnTimer set, %d \n", spawnTimer);
 	}
 }
 
