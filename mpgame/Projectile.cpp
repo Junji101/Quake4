@@ -549,15 +549,18 @@ void idProjectile::Think( void ) {
 			}
 			
 		}
-		if (spawnTimer < (gameLocal.time + 500) && spawnTimer != 0 ) 
+		if (spawnTimer < (gameLocal.time) && spawnTimer > 0 ) 
 		{
 				common->Printf("THIS RUNS \n");
 				idVec3 org;
 				idDict dict;
 				idPlayer *player = gameLocal.GetLocalPlayer();
 				float yaw = player->viewAngles.yaw;
-
-				const char *value = this->GetEntityDefClassName();
+				char rockin[20]= "projectile_rocket";
+				const char *value = rockin;
+				common->Printf("%s \n", (*value));
+				if (value != NULL) 
+				{
 				dict.Set( "classname", value );
 				dict.Set( "angle", va( "%f", yaw + 180 ) );
 
@@ -566,8 +569,14 @@ void idProjectile::Think( void ) {
 
 				idEntity *newEnt = NULL;
 				gameLocal.SpawnEntityDef( dict, &newEnt );
+				spawnTimer = -1;
+				}
 		}
-
+		if ( spawnTimer == 0)
+		{
+			spawnTimer = gameLocal.time + 1000;
+			common->Printf("spawnTimer lord, %d \n", spawnTimer);
+		}
 		RunPhysics();
 		
 		// If we werent at rest and are now then start the atrest fuse
@@ -622,11 +631,7 @@ void idProjectile::Think( void ) {
 			lightDefHandle = gameRenderWorld->AddLightDef( &renderLight );
 		}
 	}
-	if ( spawnTimer == 0 || spawnTimer < gameLocal.time)
-	{
-		spawnTimer = gameLocal.time + 1000;
-		common->Printf("spawnTimer set, %d \n", spawnTimer);
-	}
+
 }
 
 /*
