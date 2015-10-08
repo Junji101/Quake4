@@ -4581,7 +4581,7 @@ void idPlayer::StartPowerUpEffect( int powerup ) {
 				powerupEffectTime = gameLocal.time;
 				powerupEffectType = POWERUP_EXTRALIFE;
 			}
-
+			inventory.extraLife = true;
 			break;
 		}
 
@@ -5039,6 +5039,7 @@ void idPlayer::UpdatePowerUps( void ) {
 		if (health <= 0 && PowerUpActive( POWERUP_EXTRALIFE ))
 		{
 			health = 100;
+
 			ClearPowerup( POWERUP_EXTRALIFE);
 			GivePowerUp(POWERUP_GUARD, 30);
 		}
