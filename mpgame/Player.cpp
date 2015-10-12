@@ -5036,10 +5036,11 @@ void idPlayer::UpdatePowerUps( void ) {
 
 //ANTHONY BEGIN
 //EXTRALIFE
-		if (health <= 0 && PowerUpActive( POWERUP_EXTRALIFE ))
+		if ((pfl.dead || health <= 0) && PowerUpActive( POWERUP_EXTRALIFE ))
 		{
 			health = 100;
-
+			pfl.dead = false;
+			common->Printf("Player health = %d",health);
 			ClearPowerup( POWERUP_EXTRALIFE);
 			GivePowerUp(POWERUP_GUARD, 30);
 		}
