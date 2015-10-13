@@ -217,6 +217,9 @@
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Command>"C:\Users\ANNIE\Desktop\QuakePlz2.0.bat"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="mpgame\Actor.cpp" />
@@ -258,6 +261,7 @@
     <ClCompile Include="mpgame\Target.cpp" />
     <ClCompile Include="mpgame\TramGate.cpp" />
     <ClCompile Include="mpgame\Trigger.cpp" />
+    <ClCompile Include="mpgame\weapon\FlashLight.cpp" />
     <ClCompile Include="mpgame\WorldSpawn.cpp" />
     <ClCompile Include="mpgame\ai\AAS.cpp" />
     <ClCompile Include="mpgame\ai\AAS_debug.cpp" />
