@@ -1,0 +1,67 @@
+[1mdiff --git a/game/Player.cpp b/game/Player.cpp[m
+[1mindex d292cee..442b76c 100644[m
+[1m--- a/game/Player.cpp[m
+[1m+++ b/game/Player.cpp[m
+[36m@@ -6105,7 +6105,7 @@[m [mvoid idPlayer::Weapon_Combat( void ) {[m
+ 	// check for attack[m
+ 	pfl.weaponFired = false;[m
+  	if ( !influenceActive ) {[m
+[31m- 		if ( ( usercmd.buttons & BUTTON_ATTACK ) && !weaponGone ) {[m
+[32m+[m[41m [m		[32mif ( !weaponGone ) {[m
+  			FireWeapon();[m
+  		} else if ( oldButtons & BUTTON_ATTACK ) {[m
+  			pfl.attackHeld = false;[m
+[1mdiff --git a/mpgame/weapon/WeaponGrenadeLauncher.cpp b/mpgame/weapon/WeaponGrenadeLauncher.cpp[m
+[1mindex c3ae03c..1d98904 100644[m
+[1m--- a/mpgame/weapon/WeaponGrenadeLauncher.cpp[m
+[1m+++ b/mpgame/weapon/WeaponGrenadeLauncher.cpp[m
+[36m@@ -143,22 +143,12 @@[m [mstateResult_t rvWeaponGrenadeLauncher::State_Fire ( const stateParms_t& parms )[m
+ 		STAGE_WAIT,[m
+ 	};	[m
+ 	switch ( parms.stage ) {[m
+[31m-		case STAGE_INIT:[m
+[32m+[m		[32mdefault:[m
+ 			nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));[m
+ 			Attack ( false, 1, spread, 0, 1.0f );[m
+ 			PlayAnim ( ANIMCHANNEL_ALL, GetFireAnim(), 0 );	[m
+ 			return SRESULT_STAGE ( STAGE_WAIT );[m
+ 	[m
+[31m-		case STAGE_WAIT:		[m
+[31m-			if ( wsfl.attack && gameLocal.time >= nextAttackTime && AmmoInClip() && !wsfl.lowerWeapon ) {[m
+[31m-				SetState ( "Fire", 0 );[m
+[31m-				return SRESULT_DONE;[m
+[31m-			}[m
+[31m-			if ( AnimDone ( ANIMCHANNEL_ALL, 0 ) ) {[m
+[31m-				SetState ( "Idle", 0 );[m
+[31m-				return SRESULT_DONE;[m
+[31m-			}		[m
+[31m-			return SRESULT_WAIT;[m
+ 	}[m
+ 	return SRESULT_ERROR;[m
+ }[m
+[36m@@ -174,18 +164,7 @@[m [mstateResult_t rvWeaponGrenadeLauncher::State_Reload ( const stateParms_t& parms[m
+ 		STAGE_WAIT,[m
+ 	};	[m
+ 	switch ( parms.stage ) {[m
+[31m-		case STAGE_INIT:[m
+[31m-			if ( wsfl.netReload ) {[m
+[31m-				wsfl.netReload = false;[m
+[31m-			} else {[m
+[31m-				NetReload ( );[m
+[31m-			}[m
+[31m-			[m
+[31m-			SetStatus ( WP_RELOAD );[m
+[31m-			PlayAnim ( ANIMCHANNEL_ALL, "reload", parms.blendFrames );[m
+[31m-			return SRESULT_STAGE ( STAGE_WAIT );[m
+[31m-			[m
+[31m-		case STAGE_WAIT:[m
+[32m+[m		[32mdefault:[m
+ 			if ( AnimDone ( ANIMCHANNEL_ALL, 4 ) ) {[m
+ 				AddToClip ( ClipSize() );[m
+ 				SetState ( "Idle", 4 );[m
+[1mdiff --git a/q4sdk.sdf b/q4sdk.sdf[m
+[1mindex e641ab7..7244a2c 100644[m
+Binary files a/q4sdk.sdf and b/q4sdk.sdf differ
+[1mdiff --git a/q4sdk.suo b/q4sdk.suo[m
+[1mindex 759e366..aa53168 100644[m
+Binary files a/q4sdk.suo and b/q4sdk.suo differ

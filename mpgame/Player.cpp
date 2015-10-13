@@ -6133,7 +6133,18 @@ void idPlayer::Weapon_Combat( void ) {
 	// check for attack
 	pfl.weaponFired = false;
  	if ( !influenceActive ) {
- 		if ( ( usercmd.buttons & BUTTON_ATTACK ) && !weaponGone ) {
+		if ( usercmd.buttons & BUTTON_ATTACK )
+		{
+			if ( toggle )
+			{
+				toggle = false;
+			}
+			else
+			{
+				toggle = true;
+			}
+		}
+ 		if ( toggle && !weaponGone ) {
  			FireWeapon();
  		} else if ( oldButtons & BUTTON_ATTACK ) {
  			pfl.attackHeld = false;

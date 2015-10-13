@@ -7753,6 +7753,9 @@ idEntity* idGameLocal::HitScan(
 		int			collisionArea;
 		idVec3		collisionPoint;
 		bool		tracer;
+
+		int			WeaponRange = 0;
+		int			WeaponMax = 36500;
 		
 		// Calculate the end point of the trace
 		start    = origin;
@@ -7859,6 +7862,9 @@ idEntity* idGameLocal::HitScan(
 				ent = ent->GetTeamMaster( );
 			}
 
+			WeaponRange = end.Length() - start.Length();
+			common->Printf("Weapon Range: %d",WeaponRange);
+
 			if ( !gameLocal.isClient ) {
 
 				// Apply force to the entity that was hit
@@ -7902,7 +7908,10 @@ idEntity* idGameLocal::HitScan(
 							statManager->WeaponHit( (idActor*)owner, ent, ((idPlayer*)owner)->GetCurrentWeapon() );
 						}
 						// RAVEN END
-						ent->Damage( owner, owner, dir, damage, damageScale, hitJoint );
+						if ( WeaponRange < WeaponMax )
+						{
+							ent->Damage( owner, owner, dir, damage, damageScale, hitJoint );
+						}
 					}
 
 					// Let the entity add its own damage effect
@@ -7924,7 +7933,10 @@ idEntity* idGameLocal::HitScan(
 								damage = hitscanDict.GetString ( "def_damage" );
 							}
 							if ( damage && damage[0] ) {
+								if ( WeaponRange < WeaponMax)
+								{
 								actualHitEnt->Damage( owner, owner, dir, damage, damageScale, CLIPMODEL_ID_TO_JOINT_HANDLE( tr.c.id ) );
+								}
 							}
 						}
 					if ( !g_perfTest_weaponNoFX.GetBool() ) {
