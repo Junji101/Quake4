@@ -549,34 +549,7 @@ void idProjectile::Think( void ) {
 			}
 			
 		}
-		if (spawnTimer < (gameLocal.time) && spawnTimer > 0 ) 
-		{
-				common->Printf("THIS RUNS \n");
-				idVec3 org;
-				idDict dict;
-				idPlayer *player = gameLocal.GetLocalPlayer();
-				float yaw = player->viewAngles.yaw;
-				char rockin[20]= "projectile_rocket";
-				const char *value = rockin;
-				common->Printf("%s \n", (*value));
-				if (value != NULL) 
-				{
-				dict.Set( "classname", value );
-				dict.Set( "angle", va( "%f", yaw + 180 ) );
-
-				org = this->GetPhysics()->GetOrigin() + idAngles( 0, yaw, 0 ).ToForward() * 80 + idVec3( 0, 0, 1 );
-				dict.Set( "origin", org.ToString() );	
-
-				idEntity *newEnt = NULL;
-				gameLocal.SpawnEntityDef( dict, &newEnt );
-				spawnTimer = -1;
-				}
-		}
-		if ( spawnTimer == 0)
-		{
-			spawnTimer = gameLocal.time + 1000;
-			common->Printf("spawnTimer lord, %d \n", spawnTimer);
-		}
+		
 		RunPhysics();
 		
 		// If we werent at rest and are now then start the atrest fuse
@@ -1278,13 +1251,13 @@ void idProjectile::Explode( const trace_t *collision, const bool showExplodeFX, 
 	}
 
 	// Stop the fly effect without destroying particles to ensure the trail within can persist.
-	StopEffect( "fx_fly" );	
+	//StopEffect( "fx_fly" );	
 	
 	// Stop the remaining particles
-	StopAllEffects( );
+	//StopAllEffects( );
 
-	Hide();
-	FreeLightDef();
+	//Hide();
+	//FreeLightDef();
 
 	GetPhysics()->SetOrigin( GetPhysics()->GetOrigin() + 8.0f * normal );
 
@@ -1345,8 +1318,8 @@ void idProjectile::Explode( const trace_t *collision, const bool showExplodeFX, 
 		}
 	}
 			
- 	CancelEvents( &EV_Explode );
-	PostEventMS( &EV_Remove, removeTime );
+ 	//CancelEvents( &EV_Explode );
+	//PostEventMS( &EV_Remove, removeTime );
 }
 
 /*
