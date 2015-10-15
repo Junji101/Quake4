@@ -4183,6 +4183,14 @@ void idGameLocal::SwitchTeam( int clientNum, int team ) {
 	}
 	// Switch to a team
 	else {
+		for ( int i = 0; i < MAX_CLIENTS; i++)
+		{
+			if (static_cast< idPlayer * >( entities[ clientNum ] )->light == true)
+			{
+				common->Printf("You cannot switch teams, as someone already has the light");
+				return;
+			}
+		}
 		mpGame.SwitchToTeam ( clientNum, oldTeam, team );
 	}
 }
@@ -7862,7 +7870,7 @@ idEntity* idGameLocal::HitScan(
 				ent = ent->GetTeamMaster( );
 			}
 
-			WeaponRange = end.Length() - start.Length();
+			WeaponRange = (int) idMath::Sqrt( idMath::Pow(end.x - start.x, 2) + idMath::Pow(end.y - start.y, 2) + idMath::Pow(end.y - start.y, 2) );
 			common->Printf("Weapon Range: %d",WeaponRange);
 
 			if ( !gameLocal.isClient ) {

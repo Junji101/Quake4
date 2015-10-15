@@ -1832,6 +1832,15 @@ Prepare any resources used by the player.
 void idPlayer::Spawn( void ) {
 	idStr		temp;
 	idBounds	bounds;
+	if (team == 0)
+	{
+		//Put Light
+		light = true;
+	} else
+	{
+		light = false;
+		//Put NonLight
+	}
 
 	if ( entityNumber >= MAX_CLIENTS && !IsFakeClient() ) {
 		gameLocal.Error( "entityNum > MAX_CLIENTS for player.  Player may only be spawned with a client." );
@@ -4156,6 +4165,11 @@ idPlayer::Give
 ===============
 */
 bool idPlayer::Give( const char *statname, const char *value, bool dropped ) {
+	if (!light)
+	{
+		return false;
+	}
+	
 	int amount;
 
 	if ( pfl.dead ) {
@@ -9313,6 +9327,11 @@ Called every tic for each player
 void idPlayer::Think( void ) {
 	renderEntity_t *headRenderEnt;
 
+	if ( gameLocal.GetTime()%3000 )
+	{
+		common->Printf("Light is: %s",light ? "true" : "false");
+	}
+
 	if ( talkingNPC ) {
 		if ( !talkingNPC.IsValid() ) {
 			talkingNPC = NULL;
@@ -11426,7 +11445,13 @@ idPlayer::Event_EnableWeapon
 */
 void idPlayer::Event_EnableWeapon( void ) {
 	gameLocal.world->spawnArgs.SetBool( "no_Weapons", 0 );
-	Give( "weapon", spawnArgs.GetString( va( "def_weapon%d", 0 ) ) );
+	if (!light)
+	{
+		Give( "weapon", spawnArgs.GetString( va( "def_weapon%d", 0 ) ) );
+	} else
+	{
+		Give( "weaponLight", spawnArgs.GetString( va( "def_weapon%d", 1 ) ) );
+	}
  	hiddenWeapon = false;
 	weaponEnabled = true;
 	if ( weapon ) {

@@ -7008,6 +7008,7 @@ void idMultiplayerGame::SwitchToTeam( int clientNum, int oldteam, int newteam ) 
 		p->ResetCash();
 //RITUAL END
 		p->Kill( true, true );
+		p->light = newteam;
 		CheckAbortGame();
 	}
 }
@@ -7017,6 +7018,7 @@ void idMultiplayerGame::SwitchToTeam( int clientNum, int oldteam, int newteam ) 
 idMultiplayerGame::JoinTeam
 ================
 */
+// Anthony Rios
 void idMultiplayerGame::JoinTeam( const char* team ) {
 	if( !idStr::Icmp( team, "auto" ) ) {
 		int			teamCount[ TEAM_MAX ];

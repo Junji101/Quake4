@@ -269,7 +269,9 @@ public:
 
 class idPlayer : public idActor {
 // Anthony
+public:
 	bool					toggle;
+	bool					light;
 public:
 
  	enum {
