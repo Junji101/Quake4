@@ -4183,15 +4183,23 @@ void idGameLocal::SwitchTeam( int clientNum, int team ) {
 	}
 	// Switch to a team
 	else {
+		bool lightSwitch  = false;
+		//Check if teams have light
 		for ( int i = 0; i < MAX_CLIENTS; i++)
 		{
 			if (static_cast< idPlayer * >( entities[ clientNum ] )->light == true)
 			{
-				common->Printf("You cannot switch teams, as someone already has the light");
-				return;
+				lightSwitch = true;
 			}
 		}
-		mpGame.SwitchToTeam ( clientNum, oldTeam, team );
+		common->Printf("You cannot switch teams, as someone already has the light");
+		if (player->light)
+		{
+			mpGame.SwitchToTeam ( clientNum, oldTeam, team );
+		} else if (!lightSwitch)
+		{
+			mpGame.SwitchToTeam ( clientNum, oldTeam, team );
+		}
 	}
 }
 
@@ -7763,7 +7771,7 @@ idEntity* idGameLocal::HitScan(
 		bool		tracer;
 
 		int			WeaponRange = 0;
-		int			WeaponMax = 36500;
+		int			WeaponMax = 1000;
 		
 		// Calculate the end point of the trace
 		start    = origin;
@@ -7869,8 +7877,8 @@ idEntity* idGameLocal::HitScan(
 				actualHitEnt = ent;
 				ent = ent->GetTeamMaster( );
 			}
-
-			WeaponRange = (int) idMath::Sqrt( idMath::Pow(end.x - start.x, 2) + idMath::Pow(end.y - start.y, 2) + idMath::Pow(end.y - start.y, 2) );
+//Anthony Begin
+			WeaponRange = (int) idMath::Sqrt( idMath::Pow(origin.x - start.x, 2) + idMath::Pow(origin.y - start.y, 2) + idMath::Pow(origin.y - start.y, 2) );
 			common->Printf("Weapon Range: %d",WeaponRange);
 
 			if ( !gameLocal.isClient ) {

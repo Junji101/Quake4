@@ -318,13 +318,13 @@ void idMultiplayerGame::SpawnPlayer( int clientNum ) {
 	if ( !p->IsFakeClient() ) {
 		bool ingame = playerState[ clientNum ].ingame;
 		// keep ingame to true if needed, that should only happen for local player
-
+		//Anthony
 		memset( &playerState[ clientNum ], 0, sizeof( playerState[ clientNum ] ) );
 		if ( !gameLocal.isClient ) {
 			p->spawnedTime = gameLocal.time;
-			//if ( gameLocal.IsTeamGame() ) {
-			//	SwitchToTeam( clientNum, -1, p->team );
-			//}
+			if ( gameLocal.IsTeamGame() ) {
+				SwitchToTeam( clientNum, -1, 0 );
+			}
 			playerState[ clientNum ].ingame = ingame;
 		}
 	}

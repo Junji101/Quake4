@@ -9327,10 +9327,10 @@ Called every tic for each player
 void idPlayer::Think( void ) {
 	renderEntity_t *headRenderEnt;
 
-	if ( gameLocal.GetTime()%3000 )
-	{
-		common->Printf("Light is: %s",light ? "true" : "false");
-	}
+	//if ( gameLocal.GetTime()%3000 )
+	//{
+	//	common->Printf("Light is: %s",light ? "true" : "false");
+	//}
 
 	if ( talkingNPC ) {
 		if ( !talkingNPC.IsValid() ) {
@@ -9923,6 +9923,19 @@ void idPlayer::Killed( idEntity *inflictor, idEntity *attacker, int damage, cons
 			if ( methodOfDeath == -1 ) {
 				methodOfDeath = MAX_WEAPONS + isTelefragged;
 			}
+//ANTHONY
+			//if you have light and get killed you and killer switch teams
+			if (this->light && killer != NULL)
+			{
+				//Swtich killed player to other team
+				gameLocal.SwitchTeam(gameLocal.mpGame.GetClientNumFromPlayerName(this->GetName()), 0);
+				common->Printf("YOU DIED: %s\n",this->GetName());
+				//Switch killer to this team
+				gameLocal.SwitchTeam(gameLocal.mpGame.GetClientNumFromPlayerName(killer->GetName()), 1);
+				common->Printf("YOU GOT REPLACED: %s\n",killer->GetName());
+			}
+
+
 
 // RAVEN BEGIN
 // jnewquist: Use accessor for static class type 
