@@ -4183,7 +4183,23 @@ void idGameLocal::SwitchTeam( int clientNum, int team ) {
 	}
 	// Switch to a team
 	else {
-		mpGame.SwitchToTeam ( clientNum, oldTeam, team );
+		bool lightSwitch  = false;
+		//Check if teams have light
+		for ( int i = 0; i < MAX_CLIENTS; i++)
+		{
+			if (static_cast< idPlayer * >( entities[ clientNum ] )->light == true)
+			{
+				lightSwitch = true;
+			}
+		}
+		common->Printf("You cannot switch teams, as someone already has the light");
+		if (player->light)
+		{
+			mpGame.SwitchToTeam ( clientNum, oldTeam, team );
+		} else if (!lightSwitch)
+		{
+			mpGame.SwitchToTeam ( clientNum, oldTeam, team );
+		}
 	}
 }
 
@@ -7753,6 +7769,9 @@ idEntity* idGameLocal::HitScan(
 		int			collisionArea;
 		idVec3		collisionPoint;
 		bool		tracer;
+
+		int			WeaponRange = 0;
+		int			WeaponMax = 1000;
 		
 		// Calculate the end point of the trace
 		start    = origin;
@@ -7858,6 +7877,9 @@ idEntity* idGameLocal::HitScan(
 				actualHitEnt = ent;
 				ent = ent->GetTeamMaster( );
 			}
+//Anthony Begin
+			WeaponRange = (int) idMath::Sqrt( idMath::Pow(origin.x - start.x, 2) + idMath::Pow(origin.y - start.y, 2) + idMath::Pow(origin.y - start.y, 2) );
+			common->Printf("Weapon Range: %d",WeaponRange);
 
 			if ( !gameLocal.isClient ) {
 
@@ -7902,7 +7924,10 @@ idEntity* idGameLocal::HitScan(
 							statManager->WeaponHit( (idActor*)owner, ent, ((idPlayer*)owner)->GetCurrentWeapon() );
 						}
 						// RAVEN END
-						ent->Damage( owner, owner, dir, damage, damageScale, hitJoint );
+						if ( WeaponRange < WeaponMax )
+						{
+							ent->Damage( owner, owner, dir, damage, damageScale, hitJoint );
+						}
 					}
 
 					// Let the entity add its own damage effect
@@ -7924,7 +7949,10 @@ idEntity* idGameLocal::HitScan(
 								damage = hitscanDict.GetString ( "def_damage" );
 							}
 							if ( damage && damage[0] ) {
+								if ( WeaponRange < WeaponMax)
+								{
 								actualHitEnt->Damage( owner, owner, dir, damage, damageScale, CLIPMODEL_ID_TO_JOINT_HANDLE( tr.c.id ) );
+								}
 							}
 						}
 					if ( !g_perfTest_weaponNoFX.GetBool() ) {

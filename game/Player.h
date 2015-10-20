@@ -194,6 +194,8 @@ const int	ASYNC_PLAYER_TOURNEY_STATUS_BITS = idMath::BitsForInteger( PTS_NUM_STA
 
 class idInventory {
 public:
+	bool					lightPlayer;
+public:
 	int						maxHealth;
 	int						weapons;
 // RITUAL BEGIN

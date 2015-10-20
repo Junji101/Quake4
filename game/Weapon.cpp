@@ -2732,6 +2732,8 @@ void rvWeapon::OnLaunchProjectile ( idProjectile* proj ) {
 	}
 }
 
+
+
 /*
 ================
 rvWeapon::Hitscan

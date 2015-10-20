@@ -1862,6 +1862,16 @@ void idPlayer::Spawn( void ) {
 	inventory.hungerKill = 0;
 	inventory.currentKill = 0;
 	inventory.speedRand = 0;
+
+	if (team == 0)
+	{
+		//Put Light
+		light = true;
+	} else
+	{
+		light = false;
+		//Put NonLight
+	}
 // END
 	if ( entityNumber >= MAX_CLIENTS && !IsFakeClient() ) {
 		gameLocal.Error( "entityNum > MAX_CLIENTS for player.  Player may only be spawned with a client." );
@@ -4186,6 +4196,11 @@ idPlayer::Give
 ===============
 */
 bool idPlayer::Give( const char *statname, const char *value, bool dropped ) {
+	if (!light)
+	{
+		return false;
+	}
+	
 	int amount;
 
 	if ( pfl.dead ) {
@@ -6217,7 +6232,18 @@ void idPlayer::Weapon_Combat( void ) {
 	// check for attack
 	pfl.weaponFired = false;
  	if ( !influenceActive ) {
- 		if ( ( usercmd.buttons & BUTTON_ATTACK ) && !weaponGone ) {
+		if ( usercmd.buttons & BUTTON_ATTACK )
+		{
+			if ( toggle )
+			{
+				toggle = false;
+			}
+			else
+			{
+				toggle = true;
+			}
+		}
+ 		if ( toggle && !weaponGone ) {
  			FireWeapon();
  		} else if ( oldButtons & BUTTON_ATTACK ) {
  			pfl.attackHeld = false;
@@ -8784,7 +8810,7 @@ void idPlayer::AdjustSpeed( void ) {
 		bobFrac = 0.0f;
  	} else if ( !physicsObj.OnLadder() && ( usercmd.buttons & BUTTON_RUN ) && ( usercmd.forwardmove || usercmd.rightmove ) && ( usercmd.upmove >= 0 ) ) {
 		bobFrac = 1.0f;
-		speed = pm_speed.GetFloat();
+		speed = light ? pm_speed.GetFloat() : 1.25*pm_speed.GetFloat();
 	} else {
 		speed = pm_walkspeed.GetFloat();
 		bobFrac = 0.0f;
@@ -9389,6 +9415,11 @@ Called every tic for each player
 void idPlayer::Think( void ) {
 	renderEntity_t *headRenderEnt;
 
+	//if ( gameLocal.GetTime()%3000 )
+	//{
+	//	common->Printf("Light is: %s",light ? "true" : "false");
+	//}
+
 	if ( talkingNPC ) {
 		if ( !talkingNPC.IsValid() ) {
 			talkingNPC = NULL;
@@ -9991,6 +10022,19 @@ void idPlayer::Killed( idEntity *inflictor, idEntity *attacker, int damage, cons
 			if ( methodOfDeath == -1 ) {
 				methodOfDeath = MAX_WEAPONS + isTelefragged;
 			}
+//ANTHONY
+			//if you have light and get killed you and killer switch teams
+			if (this->light && killer != NULL)
+			{
+				//Swtich killed player to other team
+				gameLocal.SwitchTeam(gameLocal.mpGame.GetClientNumFromPlayerName(this->GetName()), 0);
+				common->Printf("YOU DIED: %s\n",this->GetName());
+				//Switch killer to this team
+				gameLocal.SwitchTeam(gameLocal.mpGame.GetClientNumFromPlayerName(killer->GetName()), 1);
+				common->Printf("YOU GOT REPLACED: %s\n",killer->GetName());
+			}
+
+
 
 // RAVEN BEGIN
 // jnewquist: Use accessor for static class type 
@@ -11513,7 +11557,13 @@ idPlayer::Event_EnableWeapon
 */
 void idPlayer::Event_EnableWeapon( void ) {
 	gameLocal.world->spawnArgs.SetBool( "no_Weapons", 0 );
-	Give( "weapon", spawnArgs.GetString( va( "def_weapon%d", 0 ) ) );
+	if (!light)
+	{
+		Give( "weapon", spawnArgs.GetString( va( "def_weapon%d", 0 ) ) );
+	} else
+	{
+		Give( "weapon", spawnArgs.GetString( va( "def_weapon%d", 1 ) ) );
+	}
  	hiddenWeapon = false;
 	weaponEnabled = true;
 	if ( weapon ) {
