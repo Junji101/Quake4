@@ -231,7 +231,6 @@ void rvWeaponGauntlet::Attack ( void ) {
 		
 	// Entity we hit?
 	ent = gameLocal.entities[tr.c.entityNum];
-
 	// If the impact material changed then stop the impact effect 
 	if ( (tr.c.materialType && tr.c.materialType->Index ( ) != impactMaterial) ||
 		 (!tr.c.materialType && impactMaterial != -1) ) {

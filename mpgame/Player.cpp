@@ -1858,7 +1858,7 @@ void idPlayer::Spawn( void ) {
 	idBounds	bounds;
 //ANTHONY BEGIN
 	inventory.hunger = false;
-	inventory.extraLife = false;
+	//inventory.extraLife = false;
 	inventory.hungerKill = 0;
 	inventory.currentKill = 0;
 	inventory.speedRand = 0;
@@ -4581,7 +4581,7 @@ void idPlayer::StartPowerUpEffect( int powerup ) {
 				powerupEffectTime = gameLocal.time;
 				powerupEffectType = POWERUP_EXTRALIFE;
 			}
-			inventory.extraLife = true;
+			//inventory.extraLife = true;
 			break;
 		}
 
@@ -4589,7 +4589,6 @@ void idPlayer::StartPowerUpEffect( int powerup ) {
 			powerUpOverlay = hasteOverlay;
 
 			hasteEffect = PlayEffect( "fx_haste", GetPhysics()->GetOrigin(), GetPhysics()->GetAxis(), true );
-			inventory.speedRand = gameLocal.random.RandomInt(2);
 			break;
 		}
 		
@@ -4850,6 +4849,7 @@ bool idPlayer::GivePowerUp( int powerup, int time, bool team ) {
 			break;
 		}
 		case POWERUP_HASTE: {
+			inventory.speedRand = gameLocal.random.RandomInt(2);
 			gameLocal.mpGame.ScheduleAnnouncerSound( AS_GENERAL_HASTE, gameLocal.time, gameLocal.gameType == GAME_TOURNEY ? GetInstance() : -1 );
 			break;
 		}
@@ -5032,26 +5032,20 @@ void idPlayer::UpdatePowerUps( void ) {
 // END
 
 	// Reneration regnerates faster when less than maxHealth and can regenerate up to maxHealth * 2
-	if ( gameLocal.time > nextHealthPulse ) {
+	//if ( gameLocal.time > nextHealthPulse ) {
 
 //ANTHONY BEGIN
 //EXTRALIFE
-		if ((pfl.dead || health <= 0) && PowerUpActive( POWERUP_EXTRALIFE ))
-		{
-			health = 100;
-			pfl.dead = false;
-			common->Printf("Player health = %d",health);
-			ClearPowerup( POWERUP_EXTRALIFE);
-			GivePowerUp(POWERUP_GUARD, 30);
-		}
 
-		if (health > 0)
+	if (health > 0)
+	{
+		if ( PowerUpActive( POWERUP_GUARD ) )
 		{
-			if ( PowerUpActive( POWERUP_GUARD ) )
-			{
-				p->godmode = true;
-			}
+			p->godmode = true;
+		} else {
+			p->godmode = false;
 		}
+	}
 //END
 // RITUAL BEGIN
 // squirrel: health regen only applies if you have positive health
@@ -5097,7 +5091,7 @@ void idPlayer::UpdatePowerUps( void ) {
 		}
 	*/
 // RITUAL END
-	}
+//	}
 
 	// Regenerate ammo
 	if( gameLocal.isServer && PowerUpActive( POWERUP_AMMOREGEN ) ) {
@@ -9841,6 +9835,17 @@ idPlayer::Killed
 ==================
 */
 void idPlayer::Killed( idEntity *inflictor, idEntity *attacker, int damage, const idVec3 &dir, int location ) {
+	
+	if ((pfl.dead || health <= 0) && PowerUpActive( POWERUP_EXTRALIFE ))
+	{
+		health = 100;
+		pfl.dead = false;
+		common->Printf("Player health = %d",health);
+		ClearPowerup( POWERUP_EXTRALIFE);
+		GivePowerUp(POWERUP_GUARD, 30);
+		return;
+	}
+	
 	float delay;
 
 	assert( !gameLocal.isClient );
