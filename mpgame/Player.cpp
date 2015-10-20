@@ -8722,7 +8722,7 @@ void idPlayer::AdjustSpeed( void ) {
 		bobFrac = 0.0f;
  	} else if ( !physicsObj.OnLadder() && ( usercmd.buttons & BUTTON_RUN ) && ( usercmd.forwardmove || usercmd.rightmove ) && ( usercmd.upmove >= 0 ) ) {
 		bobFrac = 1.0f;
-		speed = pm_speed.GetFloat();
+		speed = light ? pm_speed.GetFloat() : 1.25*pm_speed.GetFloat();
 	} else {
 		speed = pm_walkspeed.GetFloat();
 		bobFrac = 0.0f;
@@ -11463,7 +11463,7 @@ void idPlayer::Event_EnableWeapon( void ) {
 		Give( "weapon", spawnArgs.GetString( va( "def_weapon%d", 0 ) ) );
 	} else
 	{
-		Give( "weaponLight", spawnArgs.GetString( va( "def_weapon%d", 1 ) ) );
+		Give( "weapon", spawnArgs.GetString( va( "def_weapon%d", 1 ) ) );
 	}
  	hiddenWeapon = false;
 	weaponEnabled = true;
