@@ -4187,7 +4187,7 @@ void idGameLocal::SwitchTeam( int clientNum, int team ) {
 		//Check if teams have light
 		for ( int i = 0; i < MAX_CLIENTS; i++)
 		{
-			if (static_cast< idPlayer * >( entities[ clientNum ] )->light == true)
+			if (static_cast< idPlayer * >( entities[ i ] )->light == true)
 			{
 				lightSwitch = true;
 			}

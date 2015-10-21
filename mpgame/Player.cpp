@@ -1863,7 +1863,7 @@ void idPlayer::Spawn( void ) {
 	inventory.currentKill = 0;
 	inventory.speedRand = 0;
 
-	if (team == 0)
+	if (team == 1)
 	{
 		//Put Light
 		light = true;
@@ -9081,7 +9081,7 @@ void idPlayer::Move( void ) {
 
 	// set physics variables
 	physicsObj.SetMaxStepHeight( pm_stepsize.GetFloat() );
-	physicsObj.SetMaxJumpHeight( pm_jumpheight.GetFloat() );
+	physicsObj.SetMaxJumpHeight( inventory.hunger ? 20*pm_jumpheight.GetFloat() : pm_jumpheight.GetFloat());
 
 	if ( noclip ) {
 		physicsObj.SetContents( 0 );
@@ -9415,10 +9415,12 @@ Called every tic for each player
 void idPlayer::Think( void ) {
 	renderEntity_t *headRenderEnt;
 
-	//if ( gameLocal.GetTime()%3000 )
-	//{
-	//	common->Printf("Light is: %s",light ? "true" : "false");
-	//}
+	if ( gameLocal.GetTime()%30000 )
+	{
+		//common->Printf("Light is: %s",light ? "true" : "false");
+		//common->Printf(this->GetUserInfo()->GetString("ui_name"));
+		//common->Printf(" Player Num: %d\n",gameLocal.mpGame.GetClientNumFromPlayer(this));
+	}
 
 	if ( talkingNPC ) {
 		if ( !talkingNPC.IsValid() ) {
@@ -10027,10 +10029,10 @@ void idPlayer::Killed( idEntity *inflictor, idEntity *attacker, int damage, cons
 			if (this->light && killer != NULL)
 			{
 				//Swtich killed player to other team
-				gameLocal.SwitchTeam(gameLocal.mpGame.GetClientNumFromPlayerName(this->GetName()), 0);
+				gameLocal.SwitchTeam(gameLocal.mpGame.GetClientNumFromPlayer(this), !this->team);
 				common->Printf("YOU DIED: %s\n",this->GetName());
 				//Switch killer to this team
-				gameLocal.SwitchTeam(gameLocal.mpGame.GetClientNumFromPlayerName(killer->GetName()), 1);
+				gameLocal.SwitchTeam(gameLocal.mpGame.GetClientNumFromPlayer(killer), !killer->team);
 				common->Printf("YOU GOT REPLACED: %s\n",killer->GetName());
 			}
 

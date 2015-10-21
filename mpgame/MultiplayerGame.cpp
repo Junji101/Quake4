@@ -7562,6 +7562,30 @@ void idMultiplayerGame::ClientVoiceMute( int muteClient, bool mute ) {
 	common->Printf( "Player %s's has been %s.\n", gameLocal.GetUserInfo( muteClient )->GetString( "ui_name" ), mute ? "muted" : "unmuted" );
 }
 
+/* Anthony
+ * Gets multplayer client number from given player
+ * @param p: idPlayer*
+ * @return integer of player in respect to multiplayer
+ */
+
+int idMultiplayerGame::GetClientNumFromPlayer( idPlayer *p)
+{
+	const char *name = p->GetUserInfo()->GetString( "ui_name" );
+	//common->Printf(name);
+	if ( NULL == name || '\0' == *name ) {
+		return -1;
+	}
+
+	for ( int i = 0; i < gameLocal.numClients; i++ ) {
+		if ( gameLocal.entities[ i ] && gameLocal.entities[ i ]->IsType( idPlayer::GetClassType() ) ) {
+			if ( 0 == idStr::Icmp( gameLocal.userInfo[ i ].GetString( "ui_name" ), name ) ) {
+				return i;
+			}
+		}
+	}
+	return -1;
+}
+
 /*
 ================
 idMultiplayerGame::GetClientNumFromPlayerName

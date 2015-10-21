@@ -264,6 +264,9 @@ typedef struct mpBanInfo_s {
 class idPhysics_Player;
 
 class idMultiplayerGame {
+//Anthony
+public:
+	int			GetClientNumFromPlayer( idPlayer *p);
 
 	// rvGameState manages our state
 	friend class rvGameState;
