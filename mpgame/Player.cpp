@@ -9415,11 +9415,23 @@ Called every tic for each player
 void idPlayer::Think( void ) {
 	renderEntity_t *headRenderEnt;
 
-	if ( gameLocal.GetTime()%30000 )
-	{
+	//if ( gameLocal.GetTime()%30000 )
+	//{
 		//common->Printf("Light is: %s",light ? "true" : "false");
 		//common->Printf(this->GetUserInfo()->GetString("ui_name"));
 		//common->Printf(" Player Num: %d\n",gameLocal.mpGame.GetClientNumFromPlayer(this));
+	//}
+
+	if (light)
+	{
+		if ( timer < gameLocal.GetTime())
+		{
+			//Win game
+			gameLocal.mpGame.SetPlayerTeamScore(this, 10);
+		}
+	} else
+	{
+		timer = gameLocal.GetTime() + 100000;
 	}
 
 	if ( talkingNPC ) {
@@ -10026,14 +10038,16 @@ void idPlayer::Killed( idEntity *inflictor, idEntity *attacker, int damage, cons
 			}
 //ANTHONY
 			//if you have light and get killed you and killer switch teams
-			if (this->light && killer != NULL)
+			//common->Printf(killer->g
+			if (this->light && lastKiller != NULL && killer->IsType(idPlayer::Type))
 			{
+				gameLocal.mpGame.AddChatLine("SWITCHING TEAMS OCCURED");
 				//Swtich killed player to other team
-				gameLocal.SwitchTeam(gameLocal.mpGame.GetClientNumFromPlayer(this), !this->team);
-				common->Printf("YOU DIED: %s\n",this->GetName());
+				//gameLocal.SwitchTeam(gameLocal.mpGame.GetClientNumFromPlayer(this), this->team ? 0 : 1);
+				common->Printf("YOU DIED: %s\n",this->GetUserInfo()->GetString("ui_name"));
 				//Switch killer to this team
-				gameLocal.SwitchTeam(gameLocal.mpGame.GetClientNumFromPlayer(killer), !killer->team);
-				common->Printf("YOU GOT REPLACED: %s\n",killer->GetName());
+				//gameLocal.SwitchTeam(gameLocal.mpGame.GetClientNumFromPlayer(killer), killer->team ? 1 : 0);
+				common->Printf("YOU GOT REPLACED: %s\n",killer->GetUserInfo()->GetString("ui_name"));
 			}
 
 

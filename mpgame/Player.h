@@ -284,6 +284,7 @@ class idPlayer : public idActor {
 public:
 	bool					toggle;
 	bool					light;
+	int						timer;
 public:
 
  	enum {

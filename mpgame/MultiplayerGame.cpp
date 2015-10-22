@@ -318,13 +318,12 @@ void idMultiplayerGame::SpawnPlayer( int clientNum ) {
 	if ( !p->IsFakeClient() ) {
 		bool ingame = playerState[ clientNum ].ingame;
 		// keep ingame to true if needed, that should only happen for local player
-		//Anthony
 		memset( &playerState[ clientNum ], 0, sizeof( playerState[ clientNum ] ) );
 		if ( !gameLocal.isClient ) {
 			p->spawnedTime = gameLocal.time;
-			if ( gameLocal.IsTeamGame() ) {
-				SwitchToTeam( clientNum, -1, 0 );
-			}
+			//if ( gameLocal.IsTeamGame() ) {
+			//	SwitchToTeam( clientNum, -1, 0 );
+			//}
 			playerState[ clientNum ].ingame = ingame;
 		}
 	}
@@ -1808,7 +1807,8 @@ void idMultiplayerGame::PlayerDeath( idPlayer *dead, idPlayer *killer, int metho
 
 			} else {
 				// mark a kill
-				AddPlayerScore( killer, 1 );
+				//Anthony
+				//AddPlayerScore( killer, 1 );
 			}
 			
 			// additional CTF points
@@ -7018,7 +7018,6 @@ void idMultiplayerGame::SwitchToTeam( int clientNum, int oldteam, int newteam ) 
 idMultiplayerGame::JoinTeam
 ================
 */
-// Anthony Rios
 void idMultiplayerGame::JoinTeam( const char* team ) {
 	if( !idStr::Icmp( team, "auto" ) ) {
 		int			teamCount[ TEAM_MAX ];

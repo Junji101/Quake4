@@ -11,6 +11,9 @@
 
 class rvWeaponRocketLauncher : public rvWeapon {
 public:
+	int						Grav;
+
+public:
 
 	CLASS_PROTOTYPE( rvWeaponRocketLauncher );
 
@@ -95,7 +98,7 @@ void rvWeaponRocketLauncher::Spawn ( void ) {
 	float f;
 
 	idleEmpty = false;
-	
+
 	spawnArgs.GetFloat ( "lockRange", "0", guideRange );
 
 	spawnArgs.GetFloat ( "lockSlowdown", ".25", f );
