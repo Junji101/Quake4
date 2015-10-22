@@ -1822,7 +1822,7 @@ void idMultiplayerGame::PlayerDeath( idPlayer *dead, idPlayer *killer, int metho
 					// suicide or teamkill
 					AddTeamScore( killer->team, -1 );
 				} else {
-					AddTeamScore( killer->team, 1 );
+					//AddTeamScore( killer->team, 1 );
 				}			
 			}
 		} else {
@@ -7559,6 +7559,11 @@ void idMultiplayerGame::ClientVoiceMute( int muteClient, bool mute ) {
 
 	// display some niceties
 	common->Printf( "Player %s's has been %s.\n", gameLocal.GetUserInfo( muteClient )->GetString( "ui_name" ), mute ? "muted" : "unmuted" );
+}
+
+void idMultiplayerGame::SetGameState( mpGameState_t newState)
+{
+	gameState->NewState( newState );
 }
 
 /* Anthony

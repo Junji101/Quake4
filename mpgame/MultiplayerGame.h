@@ -267,7 +267,7 @@ class idMultiplayerGame {
 //Anthony
 public:
 	int			GetClientNumFromPlayer( idPlayer *p);
-
+	void		SetGameState( mpGameState_t newState );
 	// rvGameState manages our state
 	friend class rvGameState;
 

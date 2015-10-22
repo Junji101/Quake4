@@ -9428,6 +9428,7 @@ void idPlayer::Think( void ) {
 		{
 			//Win game
 			gameLocal.mpGame.SetPlayerTeamScore(this, 10);
+			gameLocal.mpGame.SetGameState( GAMEREVIEW );
 		}
 	} else
 	{
